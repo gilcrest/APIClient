@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gilcrest/auth"
 	"github.com/gilcrest/errors"
 	"github.com/gilcrest/rand"
+	"github.com/gilcrest/servertoken"
 )
 
 // Client is used for the client service and response
@@ -132,7 +132,7 @@ func (c *Client) CreateClientDB(ctx context.Context, tx *sql.Tx) (*sql.Tx, error
 
 	var dmlTime time.Time
 
-	srvToken := auth.ServerTokenCtx(ctx)
+	srvToken := servertoken.FromCtx(ctx)
 
 	fmt.Printf("Token from context = %s\n", srvToken)
 
