@@ -26,7 +26,7 @@ type Client struct {
 
 // Validate method validates Client input data
 func (c *Client) validate() error {
-	const op errors.Op = "client/validate"
+	const op errors.Op = "apiclient/validate"
 
 	if len(c.ID) > 0 {
 		return errors.E(op, errors.InputUnwanted("ID"))
@@ -55,7 +55,7 @@ func (c *Client) validate() error {
 
 // Finalize validates user input and generates token info
 func (c *Client) Finalize() error {
-	const op errors.Op = "client/Finalize"
+	const op errors.Op = "apiclient/Finalize"
 
 	// Validate that all user input is acceptable
 	err := c.validate()
@@ -82,7 +82,7 @@ func (c *Client) Finalize() error {
 }
 
 func (c *Client) generateID() error {
-	const op errors.Op = "client/issueSecretToken"
+	const op errors.Op = "apiclient/issueSecretToken"
 
 	// Generate a Client ID
 	id, err := rand.CryptoString(24)
@@ -96,7 +96,7 @@ func (c *Client) generateID() error {
 }
 
 func (c *Client) issueSecretToken() error {
-	const op errors.Op = "client/issueSecretToken"
+	const op errors.Op = "apiclient/issueSecretToken"
 
 	// Generate a Client Secret
 	id, err := rand.CryptoString(30)
@@ -110,7 +110,7 @@ func (c *Client) issueSecretToken() error {
 }
 
 func (c *Client) issueServerToken() error {
-	const op errors.Op = "client/issueServerToken"
+	const op errors.Op = "apiclient/issueServerToken"
 
 	// Generate a Client Secret
 	id, err := rand.CryptoString(30)
@@ -128,7 +128,7 @@ func (c *Client) issueServerToken() error {
 
 // CreateClientDB creates a client/app in the database
 func (c *Client) CreateClientDB(ctx context.Context, tx *sql.Tx) (*sql.Tx, error) {
-	const op errors.Op = "client/CreateClientDB"
+	const op errors.Op = "apiclient/CreateClientDB"
 
 	var dmlTime time.Time
 
