@@ -20,7 +20,7 @@ func ViaServerToken(ctx context.Context, db *sql.DB) (*Client, error) {
 	}
 
 	client := new(Client)
-	err = db.QueryRowContext(ctx, `select client_num,
+	err = db.QueryRowContext(ctx, `SELECT client_num,
 										  client_id,
 										  client_name,
 										  server_token,
