@@ -13,6 +13,7 @@ import (
 
 // Client is used for the client service and response
 type Client struct {
+	Number        int
 	ID            string
 	Name          string
 	ServerToken   string
@@ -132,9 +133,12 @@ func (c *Client) CreateClientDB(ctx context.Context, tx *sql.Tx) (*sql.Tx, error
 
 	var dmlTime time.Time
 
-	srvToken := servertoken.FromCtx(ctx)
+	token, err := servertoken.FromCtx(ctx)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
 
-	fmt.Printf("Token from context = %s\n", srvToken)
+	fmt.Printf("Token from context = %s\n", token)
 
 	// Prepare the sql statement using bind variables
 	stmt, err := tx.PrepareContext(ctx, `select auth.create_client (
@@ -164,7 +168,7 @@ func (c *Client) CreateClientDB(ctx context.Context, tx *sql.Tx) (*sql.Tx, error
 		c.RedirectURI,   //$6
 		c.Secret,        //$7
 		c.PrimaryUserID, //$8
-		srvToken)        //$9
+		token)           //$9
 
 	if err != nil {
 		return nil, errors.E(op, err)
