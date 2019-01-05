@@ -3,7 +3,6 @@ package apiclient
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/gilcrest/errors"
@@ -137,8 +136,6 @@ func (c *Client) CreateClientDB(ctx context.Context, tx *sql.Tx) (*sql.Tx, error
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-
-	fmt.Printf("Token from context = %s\n", token)
 
 	// Prepare the sql statement using bind variables
 	stmt, err := tx.PrepareContext(ctx, `select auth.create_client (
