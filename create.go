@@ -11,16 +11,19 @@ import (
 
 // Client is used for the client service and response
 type Client struct {
-	Number        int
-	ID            string
-	Name          string
-	ServerToken   string
-	HomeURL       string
-	Description   string
-	RedirectURI   string
-	PrimaryUserID string
-	Secret        string
-	DMLTime       time.Time
+	Number             int
+	ID                 string
+	Name               string
+	ServerToken        string
+	HomeURL            string
+	Description        string
+	RedirectURI        string
+	PrimaryUserID      string
+	Secret             string
+	CreateClientNumber int
+	CreateTimestamp    time.Time
+	UpdateClientNumber int
+	UpdateTimestamp    time.Time
 }
 
 // Validate method validates Client input data
@@ -45,8 +48,17 @@ func (c *Client) validate() error {
 	if len(c.ServerToken) != 0 {
 		return errors.E(op, errors.InputUnwanted("ServerToken"))
 	}
-	if c.DMLTime.IsZero() != true {
-		return errors.E(op, errors.InputUnwanted("DMLTime"))
+	if c.CreateClientNumber != 0 {
+		return errors.E(op, errors.InputUnwanted("CreateClientNumber"))
+	}
+	if c.CreateTimestamp.IsZero() != true {
+		return errors.E(op, errors.InputUnwanted("CreateTimestamp"))
+	}
+	if c.UpdateClientNumber != 0 {
+		return errors.E(op, errors.InputUnwanted("UpdateClientNumber"))
+	}
+	if c.UpdateTimestamp.IsZero() != true {
+		return errors.E(op, errors.InputUnwanted("UpdateTimestamp"))
 	}
 
 	return nil
