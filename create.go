@@ -7,7 +7,6 @@ import (
 
 	"github.com/gilcrest/errors"
 	"github.com/gilcrest/rand"
-	"github.com/gilcrest/servertoken"
 )
 
 // Client is used for the client service and response
@@ -127,14 +126,12 @@ func (c *Client) issueServerToken() error {
 // scope           VARCHAR(4000),
 
 // CreateClientDB creates a client/app in the database
-func (c *Client) CreateClientDB(ctx context.Context, tx *sql.Tx) (*sql.Tx, error) {
+func (c *Client) CreateClientDB(ctx context.Context, tx *sql.Tx) error {
 	const op errors.Op = "apiclient/CreateClientDB"
 
-	var dmlTime time.Time
-
-	token, err := servertoken.FromCtx(ctx)
+	createClient, err := ViaServerToken(ctx, tx)
 	if err != nil {
-		return nil, errors.E(op, err)
+		return errors.E(op, err)
 	}
 
 	// Prepare the sql statement using bind variables
@@ -147,46 +144,42 @@ func (c *Client) CreateClientDB(ctx context.Context, tx *sql.Tx) (*sql.Tx, error
 		p_redirect_uri => $6,
 		p_client_secret => $7,
 		p_primary_username => $8,
-		p_create_server_token => $9)`)
+		p_create_client_num => $9)`)
 
 	if err != nil {
-		return nil, errors.E(op, err)
+		return errors.E(op, err)
 	}
 	defer stmt.Close()
 
 	// Execute stored function that returns the create_date timestamp,
 	// hence the use of QueryContext instead of Exec
 	rows, err := stmt.QueryContext(ctx,
-		c.ID,            //$1
-		c.Name,          //$2
-		c.ServerToken,   //$3
-		c.HomeURL,       //$4
-		c.Description,   //$5
-		c.RedirectURI,   //$6
-		c.Secret,        //$7
-		c.PrimaryUserID, //$8
-		token)           //$9
+		c.ID,                //$1
+		c.Name,              //$2
+		c.ServerToken,       //$3
+		c.HomeURL,           //$4
+		c.Description,       //$5
+		c.RedirectURI,       //$6
+		c.Secret,            //$7
+		c.PrimaryUserID,     //$8
+		createClient.Number) //$9
 
 	if err != nil {
-		return nil, errors.E(op, err)
+		return errors.E(op, err)
 	}
 	defer rows.Close()
 
 	// Iterate through the returned record(s)
 	for rows.Next() {
-		if err := rows.Scan(&dmlTime); err != nil {
-			return nil, errors.E(op, err)
+		if err := rows.Scan(&c.Number); err != nil {
+			return errors.E(op, err)
 		}
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, errors.E(op, err)
+		return errors.E(op, err)
 	}
 
-	// set the DMLTime field to the create_date set as part of the insert in
-	// the stored function call above
-	c.DMLTime = dmlTime
-
-	return tx, nil
+	return nil
 
 }
