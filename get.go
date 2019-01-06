@@ -28,12 +28,17 @@ func ViaServerToken(ctx context.Context, tx *sql.Tx) (*Client, error) {
 										  app_description,
 										  redirect_uri,
 										  client_secret,
-										  primary_username
+										  primary_username,
+										  create_client_num,
+										  create_timestamp,
+										  modify_client_num,
+										  modify_timestamp
 									 FROM auth.client
 									WHERE server_token = $1`, token).
 		Scan(&client.Number, &client.ID, &client.Name,
-			&client.ServerToken, &client.HomeURL, &client.Description,
-			&client.RedirectURI, &client.Secret, &client.PrimaryUserID)
+			&client.ServerToken, &client.HomeURL, &client.Description, &client.RedirectURI, &client.Secret,
+			&client.PrimaryUserID, &client.CreateClientNumber, &client.CreateTimestamp,
+			&client.UpdateClientNumber, &client.UpdateTimestamp)
 	switch {
 	case err == sql.ErrNoRows:
 		return nil, errors.E(op, fmt.Errorf("No client with token %s", token))
