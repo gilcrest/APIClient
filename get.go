@@ -11,7 +11,7 @@ import (
 
 // ViaServerToken fetches a client from the database using the client's
 // ServerToken set in the context
-func ViaServerToken(ctx context.Context, db *sql.DB) (*Client, error) {
+func ViaServerToken(ctx context.Context, tx *sql.Tx) (*Client, error) {
 	const op errors.Op = "apiclient/ViaServerToken"
 
 	token, err := servertoken.FromCtx(ctx)
@@ -20,7 +20,7 @@ func ViaServerToken(ctx context.Context, db *sql.DB) (*Client, error) {
 	}
 
 	client := new(Client)
-	err = db.QueryRowContext(ctx, `SELECT client_num,
+	err = tx.QueryRowContext(ctx, `SELECT client_num,
 										  client_id,
 										  client_name,
 										  server_token,
