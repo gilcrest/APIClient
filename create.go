@@ -147,16 +147,20 @@ func (c *Client) CreateClientDB(ctx context.Context, tx *sql.Tx) error {
 	}
 
 	// Prepare the sql statement using bind variables
-	stmt, err := tx.PrepareContext(ctx, `select auth.create_client (
-		p_client_id => $1,
-		p_client_name => $2,
-		p_server_token => $3,
-		p_homepage_url => $4,
-		p_app_description => $5,
-		p_redirect_uri => $6,
-		p_client_secret => $7,
-		p_primary_username => $8,
-		p_create_client_num => $9)`)
+	stmt, err := tx.PrepareContext(ctx, `
+	select o_client_num, 
+	       o_create_client_num, o_create_timestamp,
+           o_update_client_num, o_update_timestamp
+	  from auth.create_client (
+			p_client_id => $1,
+			p_client_name => $2,
+			p_server_token => $3,
+			p_homepage_url => $4,
+			p_app_description => $5,
+			p_redirect_uri => $6,
+			p_client_secret => $7,
+			p_primary_username => $8,
+			p_create_client_num => $9)`)
 
 	if err != nil {
 		return errors.E(op, err)
@@ -183,7 +187,8 @@ func (c *Client) CreateClientDB(ctx context.Context, tx *sql.Tx) error {
 
 	// Iterate through the returned record(s)
 	for rows.Next() {
-		if err := rows.Scan(&c.Number); err != nil {
+		if err := rows.Scan(&c.Number, &c.CreateClientNumber, &c.CreateTimestamp,
+			&c.UpdateClientNumber, &c.UpdateTimestamp); err != nil {
 			return errors.E(op, err)
 		}
 	}
