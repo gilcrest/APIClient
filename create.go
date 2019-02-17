@@ -3,10 +3,16 @@ package apiclient
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"os"
 	"time"
 
+	"github.com/gilcrest/auth/datastore"
 	"github.com/gilcrest/errors"
 	"github.com/gilcrest/rand"
+	"github.com/gilcrest/servertoken"
+	"github.com/gilcrest/srvr"
+	"github.com/rs/zerolog"
 )
 
 // Client is used for the client service and response
@@ -199,4 +205,52 @@ func (c *Client) CreateClientDB(ctx context.Context, tx *sql.Tx) error {
 
 	return nil
 
+}
+
+// NewTestAPIClient creates a client to be used in testing only
+func NewTestAPIClient(persist bool) (*Client, error) {
+
+	client := new(Client)
+
+	client.Name = "Mock Client"
+	client.HomeURL = "www.testurl.com"
+	client.Description = "Mock Description"
+	client.RedirectURI = "Mock RedirectURI"
+	client.PrimaryUserID = "gilcrest"
+
+	err := client.Finalize()
+	if err != nil {
+		return nil, err
+	}
+
+	if persist {
+		token := servertoken.ServerToken(os.Getenv("TEST_SERVER_TOKEN"))
+		ctx := context.Background()
+		ctx = token.Add2Ctx(ctx)
+
+		srvr, err := srvr.NewServer(zerolog.DebugLevel)
+		if err != nil {
+			return nil, err
+		}
+		// get a new DB Tx
+		tx, err := srvr.DS.BeginTx(ctx, nil, datastore.AppDB)
+		if err != nil {
+			return nil, err
+		}
+
+		// Call the CreateClientDB method of the Client object
+		// to write to the db
+		err = client.CreateClientDB(ctx, tx)
+		if err != nil {
+			fmt.Println(err)
+			if rollbackErr := tx.Rollback(); rollbackErr != nil {
+				return nil, err
+			}
+		}
+
+		if err := tx.Commit(); err != nil {
+			return nil, err
+		}
+	}
+	return client, nil
 }
