@@ -7,6 +7,7 @@ import (
 
 	"github.com/gilcrest/errors"
 	"github.com/gilcrest/rand"
+	"github.com/rs/zerolog"
 )
 
 // Client is used for the client service and response
@@ -138,7 +139,7 @@ func (c *Client) issueServerToken() error {
 // scope           VARCHAR(4000),
 
 // CreateClientDB creates a client/app in the database
-func (c *Client) CreateClientDB(ctx context.Context, tx *sql.Tx) error {
+func (c *Client) CreateClientDB(ctx context.Context, log zerolog.Logger, tx *sql.Tx) error {
 	const op errors.Op = "apiclient/CreateClientDB"
 
 	createClient, err := ViaServerToken(ctx, tx)
