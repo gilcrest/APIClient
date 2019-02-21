@@ -6,16 +6,16 @@ import (
 	"fmt"
 
 	"github.com/gilcrest/errors"
+	"github.com/rs/zerolog"
 )
 
-// delete is a physical delete from the database.
+// Delete is a physical delete from the database.
 // This is only to be used for tests. Use logicalDelete
 // for normal deletes
-func (c *Client) delete(ctx context.Context, tx *sql.Tx) error {
-	const op errors.Op = "apiclient/delete"
+func Delete(ctx context.Context, log zerolog.Logger, tx *sql.Tx, c *Client) error {
+	const op errors.Op = "apiclient/Delete"
 
-	sql := `DELETE FROM auth.client
-	         WHERE client_num = $1;`
+	sql := "DELETE FROM auth.client WHERE client_num = $1;"
 	result, err := tx.Exec(sql, c.Number)
 	if err != nil {
 		return errors.E(op, err)
@@ -32,10 +32,10 @@ func (c *Client) delete(ctx context.Context, tx *sql.Tx) error {
 	return nil
 }
 
-// logicalDelete is a logical delete of the record in the database.
+// LogicalDelete is a logical delete of the record in the database.
 // This method will "end date" the record of the client, rendering
 // it inactive/unusable
-func (c *Client) logicalDelete() error {
+func (c *Client) LogicalDelete() error {
 	//TODO
 	return nil
 }
