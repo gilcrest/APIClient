@@ -42,7 +42,7 @@ func TestViaServerToken(t *testing.T) {
 	ctx2 = t2.Add2Ctx(ctx2)
 
 	// create a new client using ctx2
-	client, err := setupTestClient(ctx2, tx)
+	client, err := setupTestClient(ctx2, srvr.Logger, tx)
 	if err != nil {
 		if err != nil {
 			if rollbackErr := tx.Rollback(); rollbackErr != nil {
@@ -83,7 +83,7 @@ func TestViaServerToken(t *testing.T) {
 		})
 	}
 
-	err = client.delete(ctx3, tx)
+	err = Delete(ctx3, srvr.Logger, tx, client)
 	if err != nil {
 		if rollbackErr := tx.Rollback(); rollbackErr != nil {
 			t.Logf("Could not roll back: %v\n", rollbackErr)
@@ -97,7 +97,7 @@ func TestViaServerToken(t *testing.T) {
 
 }
 
-func setupTestClient(ctx context.Context, tx *sql.Tx) (*Client, error) {
+func setupTestClient(ctx context.Context, log zerolog.Logger, tx *sql.Tx) (*Client, error) {
 	const op errors.Op = "apiclient/ViaServerToken"
 
 	client := new(Client)
@@ -112,7 +112,7 @@ func setupTestClient(ctx context.Context, tx *sql.Tx) (*Client, error) {
 		return nil, errors.E(op, fmt.Errorf("Error = %v", err))
 	}
 
-	err = client.CreateClientDB(ctx, tx)
+	err = client.CreateClientDB(ctx, log, tx)
 	if err != nil {
 		return nil, errors.E(op, fmt.Errorf("Error = %v", err))
 	}
