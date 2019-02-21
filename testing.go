@@ -12,8 +12,9 @@ import (
 	"github.com/rs/zerolog"
 )
 
-// NewTestAPIClient creates a client to be used in testing only
-func NewTestAPIClient(t *testing.T, persist bool) *Client {
+// TestAPIClientHelper creates a client to be used in testing only
+func TestAPIClientHelper(t *testing.T) *Client {
+	t.Helper()
 
 	client := new(Client)
 
@@ -28,34 +29,38 @@ func NewTestAPIClient(t *testing.T, persist bool) *Client {
 		t.Fatalf("Client err: %s", err)
 	}
 
-	if persist {
-		token := servertoken.ServerToken(os.Getenv("TEST_SERVER_TOKEN"))
-		ctx := context.Background()
-		ctx = token.Add2Ctx(ctx)
+	token := servertoken.ServerToken(os.Getenv("TEST_SERVER_TOKEN"))
+	ctx := context.Background()
+	ctx = token.Add2Ctx(ctx)
 
-		srvr, err := srvr.NewServer(zerolog.DebugLevel)
-		if err != nil {
-			t.Fatalf("Client err: %s", err)
-		}
-		// get a new DB Tx
-		tx, err := srvr.DS.BeginTx(ctx, nil, datastore.AppDB)
-		if err != nil {
-			t.Fatalf("Client err: %s", err)
-		}
+	srvr, err := srvr.NewServer(zerolog.DebugLevel)
+	if err != nil {
+		t.Fatalf("Client err: %s", err)
+	}
+	// get a new DB Tx
+	tx, err := srvr.DS.BeginTx(ctx, nil, datastore.AppDB)
+	if err != nil {
+		t.Fatalf("Client err: %s", err)
+	}
 
-		// Call the CreateClientDB method of the Client object
-		// to write to the db
-		err = client.CreateClientDB(ctx, tx)
-		if err != nil {
-			fmt.Println(err)
-			if rollbackErr := tx.Rollback(); rollbackErr != nil {
-				t.Fatalf("Client err: %s", err)
-			}
-		}
-
-		if err := tx.Commit(); err != nil {
+	// Call the CreateClientDB method of the Client object
+	// to write to the db
+	err = client.CreateClientDB(ctx, srvr.Logger, tx)
+	if err != nil {
+		fmt.Println(err)
+		if rollbackErr := tx.Rollback(); rollbackErr != nil {
 			t.Fatalf("Client err: %s", err)
 		}
 	}
+
+	if err := tx.Commit(); err != nil {
+		t.Fatalf("Client err: %s", err)
+	}
 	return client
+}
+
+// TestDeleteAPIClientHelper creates a client to be used in testing only
+func TestDeleteAPIClientHelper(t *testing.T, c Client) {
+	t.Helper()
+
 }
