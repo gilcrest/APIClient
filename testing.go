@@ -6,9 +6,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/gilcrest/env"
+	"github.com/gilcrest/env/datastore"
 	"github.com/gilcrest/servertoken"
-	"github.com/gilcrest/srvr"
-	"github.com/gilcrest/srvr/datastore"
 	"github.com/rs/zerolog"
 )
 
@@ -33,19 +33,19 @@ func TestAPIClientHelper(t *testing.T) *Client {
 	ctx := context.Background()
 	ctx = token.Add2Ctx(ctx)
 
-	srvr, err := srvr.NewServer(zerolog.DebugLevel)
+	env, err := env.NewEnv(env.Dev, zerolog.DebugLevel)
 	if err != nil {
 		t.Fatalf("Client err: %s", err)
 	}
 	// get a new DB Tx
-	tx, err := srvr.DS.BeginTx(ctx, nil, datastore.AppDB)
+	tx, err := env.DS.BeginTx(ctx, nil, datastore.AppDB)
 	if err != nil {
 		t.Fatalf("Client err: %s", err)
 	}
 
 	// Call the CreateClientDB method of the Client object
 	// to write to the db
-	err = client.CreateClientDB(ctx, srvr.Logger, tx)
+	err = client.CreateClientDB(ctx, env.Logger, tx)
 	if err != nil {
 		fmt.Println(err)
 		if rollbackErr := tx.Rollback(); rollbackErr != nil {

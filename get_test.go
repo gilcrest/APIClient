@@ -7,10 +7,10 @@ import (
 	"os"
 	"testing"
 
+	"github.com/gilcrest/env"
+	"github.com/gilcrest/env/datastore"
 	"github.com/gilcrest/errors"
 	"github.com/gilcrest/servertoken"
-	"github.com/gilcrest/srvr"
-	"github.com/gilcrest/srvr/datastore"
 	"github.com/rs/zerolog"
 )
 
@@ -20,7 +20,7 @@ func TestViaServerToken(t *testing.T) {
 		tx  *sql.Tx
 	}
 
-	srvr, err := srvr.NewServer(zerolog.DebugLevel)
+	env, err := env.NewEnv(env.Dev, zerolog.DebugLevel)
 	if err != nil {
 		t.Errorf("Error from Newserver = %v", err)
 	}
@@ -29,7 +29,7 @@ func TestViaServerToken(t *testing.T) {
 	ctx := context.Background()
 	ctx = token1.Add2Ctx(ctx)
 
-	tx, err := srvr.DS.BeginTx(ctx, nil, datastore.AppDB)
+	tx, err := env.DS.BeginTx(ctx, nil, datastore.AppDB)
 	if err != nil {
 		t.Errorf("Error with BeginTx = %v", err)
 	}
@@ -42,7 +42,7 @@ func TestViaServerToken(t *testing.T) {
 	ctx2 = t2.Add2Ctx(ctx2)
 
 	// create a new client using ctx2
-	client, err := setupTestClient(ctx2, srvr.Logger, tx)
+	client, err := setupTestClient(ctx2, env.Logger, tx)
 	if err != nil {
 		if err != nil {
 			if rollbackErr := tx.Rollback(); rollbackErr != nil {
@@ -83,7 +83,7 @@ func TestViaServerToken(t *testing.T) {
 		})
 	}
 
-	err = Delete(ctx3, srvr.Logger, tx, client)
+	err = Delete(ctx3, env.Logger, tx, client)
 	if err != nil {
 		if rollbackErr := tx.Rollback(); rollbackErr != nil {
 			t.Logf("Could not roll back: %v\n", rollbackErr)
@@ -92,7 +92,7 @@ func TestViaServerToken(t *testing.T) {
 	}
 
 	if err := tx.Commit(); err != nil {
-		srvr.Logger.Fatal().Msgf("Could not commit: %v\n", err)
+		env.Logger.Fatal().Msgf("Could not commit: %v\n", err)
 	}
 
 }
