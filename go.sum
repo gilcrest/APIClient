@@ -1,5 +1,5 @@
-github.com/gilcrest/env v0.5.0 h1:qtr1rbm4LSfL2u/9ggUVuS1mpnGEK06tqF1HhPPpegI=
-github.com/gilcrest/env v0.5.0/go.mod h1:cV/8l+MmRddmOfVbzStOnLH4SM4jzHcjcPK2gr0oAgw=
+github.com/gilcrest/envy v0.0.1 h1:nAteff4V/zkMhAedQpc6eMefD4rm67tzWjCpuYoZpqA=
+github.com/gilcrest/envy v0.0.1/go.mod h1:FuGOUrABut4zOcdw3PvsxpJia8XWAtkSj7AU4IkWxPA=
 github.com/gilcrest/errors v0.13.1 h1:r6Caj2EunllOnRsCj475vSBaLoDhMuIKppsMh0153Wc=
 github.com/gilcrest/errors v0.13.1/go.mod h1:I/pp6AMNqp5tNurktyBw7Lu4BQu3FfsU2W/hM5yuwFE=
 github.com/gilcrest/rand v0.3.0 h1:WbOVoc1vPlN2FXORfVzZAYLC1nUVBXoEUfKht4AR9GE=

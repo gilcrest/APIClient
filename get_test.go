@@ -7,8 +7,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/gilcrest/env"
-	"github.com/gilcrest/env/datastore"
+	"github.com/gilcrest/envy"
+	"github.com/gilcrest/envy/datastore"
 	"github.com/gilcrest/errors"
 	"github.com/gilcrest/servertoken"
 	"github.com/rs/zerolog"
@@ -20,7 +20,7 @@ func TestViaServerToken(t *testing.T) {
 		tx  *sql.Tx
 	}
 
-	env, err := env.NewEnv(env.Dev, zerolog.DebugLevel)
+	env, err := envy.NewEnv(envy.Dev, zerolog.DebugLevel)
 	if err != nil {
 		t.Errorf("Error from Newserver = %v", err)
 	}

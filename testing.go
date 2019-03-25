@@ -6,8 +6,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/gilcrest/env"
-	"github.com/gilcrest/env/datastore"
+	"github.com/gilcrest/envy"
+	"github.com/gilcrest/envy/datastore"
 	"github.com/gilcrest/servertoken"
 	"github.com/rs/zerolog"
 )
@@ -33,7 +33,7 @@ func TestAPIClientHelper(t *testing.T) *Client {
 	ctx := context.Background()
 	ctx = token.Add2Ctx(ctx)
 
-	env, err := env.NewEnv(env.Dev, zerolog.DebugLevel)
+	env, err := envy.NewEnv(envy.Dev, zerolog.DebugLevel)
 	if err != nil {
 		t.Fatalf("Client err: %s", err)
 	}
