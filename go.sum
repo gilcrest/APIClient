@@ -4,8 +4,8 @@ github.com/gilcrest/errors v0.13.3 h1:cTN++wwOPN6VonU75yi6tyGjS9xmrkLmJG0z/gbOwD
 github.com/gilcrest/errors v0.13.3/go.mod h1:MXMoHeYRiVHvC2G7NTfScqIvx8lkZ9fUWYAORpBY65k=
 github.com/gilcrest/rand v0.3.0 h1:WbOVoc1vPlN2FXORfVzZAYLC1nUVBXoEUfKht4AR9GE=
 github.com/gilcrest/rand v0.3.0/go.mod h1:Qh83+hXt2ZMdIU/8fo7p/683AWruc9Erm9RWWc/IyWk=
-github.com/gilcrest/servertoken v0.4.3 h1:d+Fe0gvXfn4D67iaJSLLUzkhcNGhtUZCu04dwsqkbS0=
-github.com/gilcrest/servertoken v0.4.3/go.mod h1:PoAi3BPq+O47Ie4vZX9Q57U+goq3l+oVC6JXNp5PKOE=
+github.com/gilcrest/servertoken v0.4.4 h1:apcn3Ym2Ap4iJVjVqUwItD1lv3xakcgqk9Ua4/+tL3o=
+github.com/gilcrest/servertoken v0.4.4/go.mod h1:PoAi3BPq+O47Ie4vZX9Q57U+goq3l+oVC6JXNp5PKOE=
 github.com/gomodule/redigo v2.0.0+incompatible h1:K/R+8tc58AaqLkqG2Ol3Qk+DR/TlNuhuh457pBFPtt0=
 github.com/gomodule/redigo v2.0.0+incompatible/go.mod h1:B4C85qUVwatsJoIUNIfCRsp7qO0iAmpGFZ4EELWSbC4=
 github.com/gorilla/mux v1.7.0 h1:tOSd0UKHQd6urX6ApfOn4XdBMY6Sh1MfxV3kmaazO+U=
