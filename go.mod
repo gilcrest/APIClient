@@ -5,5 +5,6 @@ require (
 	github.com/gilcrest/errors v0.13.3
 	github.com/gilcrest/rand v0.3.0
 	github.com/gilcrest/servertoken v0.4.4
+	github.com/gorilla/mux v1.7.1 // indirect
 	github.com/rs/zerolog v1.13.0
 )
