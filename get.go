@@ -6,21 +6,15 @@ import (
 	"fmt"
 
 	"github.com/gilcrest/errors"
-	"github.com/gilcrest/servertoken"
 )
 
 // ViaServerToken fetches a client from the database using the client's
-// ServerToken set in the context
-func ViaServerToken(ctx context.Context, tx *sql.Tx) (*Client, error) {
+// ServerToken
+func ViaServerToken(ctx context.Context, token string, tx *sql.Tx) (*Client, error) {
 	const op errors.Op = "apiclient/ViaServerToken"
 
-	token, err := servertoken.FromCtx(ctx)
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-
 	client := new(Client)
-	err = tx.QueryRowContext(ctx, `SELECT client_num,
+	err := tx.QueryRowContext(ctx, `SELECT client_num,
 										  client_id,
 										  client_name,
 										  server_token,
