@@ -142,7 +142,8 @@ func (c *Client) issueServerToken() error {
 func (c *Client) CreateClientDB(ctx context.Context, log zerolog.Logger, tx *sql.Tx) error {
 	const op errors.Op = "apiclient/CreateClientDB"
 
-	createClient, err := ViaServerToken(ctx, tx)
+	// Get the API client that is creating the new API client :)
+	createClient, err := FromCtx(ctx)
 	if err != nil {
 		return errors.E(op, err)
 	}
