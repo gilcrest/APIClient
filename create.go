@@ -7,13 +7,14 @@ import (
 
 	"github.com/gilcrest/errors"
 	"github.com/gilcrest/rand"
+	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 )
 
 // Client is used for the client service and response
 type Client struct {
-	Number             int
 	ID                 string
+	ExtlID             string
 	Name               string
 	ServerToken        string
 	HomeURL            string
@@ -75,10 +76,7 @@ func (c *Client) Finalize() error {
 		return errors.E(op, err)
 	}
 
-	err = c.generateID()
-	if err != nil {
-		return errors.E(op, err)
-	}
+	c.generateID()
 
 	err = c.issueSecretToken()
 	if err != nil {
@@ -93,16 +91,24 @@ func (c *Client) Finalize() error {
 	return nil
 }
 
-func (c *Client) generateID() error {
-	const op errors.Op = "apiclient/issueSecretToken"
+func (c *Client) generateID() {
+	const op errors.Op = "apiclient/generateID"
 
-	// Generate a Client ID
+	id := uuid.New()
+
+	c.ID = id.String()
+}
+
+func (c *Client) generateExtlID() error {
+	const op errors.Op = "apiclient/generateExtlID"
+
+	// Generate External Client ID
 	id, err := rand.CryptoString(24)
 	if err != nil {
 		return errors.E(op, err)
 	}
 
-	c.ID = id
+	c.ExtlID = id
 
 	return nil
 }
@@ -150,19 +156,21 @@ func (c *Client) CreateClientDB(ctx context.Context, log zerolog.Logger, tx *sql
 
 	// Prepare the sql statement using bind variables
 	stmt, err := tx.PrepareContext(ctx, `
-	select o_client_num, 
-	       o_create_client_num, o_create_timestamp,
-           o_update_client_num, o_update_timestamp
-	  from auth.create_client (
-			p_client_id => $1,
-			p_client_name => $2,
-			p_server_token => $3,
-			p_homepage_url => $4,
-			p_app_description => $5,
-			p_redirect_uri => $6,
-			p_client_secret => $7,
-			p_primary_username => $8,
-			p_create_client_num => $9)`)
+	insert into app.client(
+		client_id,
+		client_extl_id,
+		client_name,
+		server_token,
+		homepage_url,
+		app_description,
+		redirect_uri,
+		client_secret,
+		grant_types,
+		scope,
+		create_client_id,
+		modify_client_id
+	values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+	returning create_timestamp, modify_timestamp`)
 
 	if err != nil {
 		return errors.E(op, err)
@@ -172,15 +180,18 @@ func (c *Client) CreateClientDB(ctx context.Context, log zerolog.Logger, tx *sql
 	// Execute stored function that returns the create_date timestamp,
 	// hence the use of QueryContext instead of Exec
 	rows, err := stmt.QueryContext(ctx,
-		c.ID,                //$1
-		c.Name,              //$2
-		c.ServerToken,       //$3
-		c.HomeURL,           //$4
-		c.Description,       //$5
-		c.RedirectURI,       //$6
-		c.Secret,            //$7
-		c.PrimaryUserID,     //$8
-		createClient.Number) //$9
+		c.ID,            //$1
+		c.ExtlID,        //$2
+		c.Name,          //$3
+		c.ServerToken,   //$4
+		c.HomeURL,       //$5
+		c.Description,   //$6
+		c.RedirectURI,   //$7
+		c.Secret,        //$8
+		"",              //$9
+		"",              //$10
+		createClient.ID, //$11
+		createClient.ID) //$12
 
 	if err != nil {
 		return errors.E(op, err)
@@ -189,8 +200,7 @@ func (c *Client) CreateClientDB(ctx context.Context, log zerolog.Logger, tx *sql
 
 	// Iterate through the returned record(s)
 	for rows.Next() {
-		if err := rows.Scan(&c.Number, &c.CreateClientNumber, &c.CreateTimestamp,
-			&c.UpdateClientNumber, &c.UpdateTimestamp); err != nil {
+		if err := rows.Scan(&c.CreateTimestamp, &c.UpdateTimestamp); err != nil {
 			return errors.E(op, err)
 		}
 	}
